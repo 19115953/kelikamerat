@@ -1,0 +1,8 @@
+      L.marker([60.0, 30.0]).addTo(map)
+          .bindPopup('Joku paikka');
+          //.openPopup();
+      L.marker([63.0, 26.0]).addTo(map)
+          .bindPopup('Joku toinen paikka');
+          //.openPopup();
+      console.log("Moro");
+

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fi-FI">
+	<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<link rel="stylesheet" type="text/css" href="tyylit2.css"/>
+	<style>
+		body {
+			font-family: Verdana, Geneva, sans-serif;
+		}
+		img {
+			height: auto; 
+			width: auto; 
+			max-width: 100%; 
+		}
+	</style>
+	<title>
