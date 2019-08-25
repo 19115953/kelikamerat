@@ -27,7 +27,7 @@ for (let feature of arr.features) {
         this.openPopup();
     }
 
-    htmlVali += `L.marker([${lat}, ${long}], { alt: "${id}"}).on('click', ${onClick}).on('mouseover', ${mouseOver}).addTo(map).bindPopup('${fiName}')`+"\n";
+    htmlVali += `L.marker([${lat}, ${long}], { alt: "${id}"}).on('dblclick', ${onClick}).on('click', ${mouseOver}).on('mouseover', ${mouseOver}).addTo(map).bindPopup('${fiName}')`+"\n";
     idPaikka[id] = fiName;
 }
 
