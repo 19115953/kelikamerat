@@ -71,8 +71,12 @@ app.get('/paikka', function (req, res) {
             html += fs.readFileSync('./src/paikkahtml2.txt').toString();
             html += `<h1>${idPaikka[req.query.id]}</h1>` + '\n';
             for (let camera of data.cameraPresets) {
-                html += `<hr><div><h2>${camera.presentationName}</h2>` + '\n';
-                html += `<div><img src="${camera.imageUrl}" alt="${camera.presentationName}"></div>` + '\n';
+                if (camera.presentationName) {
+                    html += `<hr><div><h2>${camera.presentationName}</h2>` + '\n';
+                } else {
+                    html += `<hr>` + '\n';
+                }
+                    html += `<div><img src="${camera.imageUrl}" alt="${camera.id}"></div>` + '\n';
                 let aikaStr = suomiAika(new Date(camera.measuredTime));
                 html += `<div>${aikaStr}</div>` + '\n';
                 html += `</div>` + '\n';
