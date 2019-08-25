@@ -69,11 +69,7 @@ app.get('/paikka', function (req, res) {
             html = fs.readFileSync('./src/paikkahtml1.txt').toString();
             html += idPaikka[req.query.id];
             html += fs.readFileSync('./src/paikkahtml2.txt').toString();
-//            html += `<div><h1 style="float:left">${idPaikka[req.query.id]}</h1>` + '\n';
-            html += `<div id="ekarivi"><h1>${idPaikka[req.query.id]}</h1>` + '\n';
-//            html += `<button type="button" style="float:right" onclick="window.close()">Sulje</button></div>` + '\n';
-            html += `<button type="button" onclick="window.close()">Sulje</button></div>` + '\n';
-            html += `<div style="clear: both;"></div>` + '\n';
+            html += `<h1>${idPaikka[req.query.id]}</h1>` + '\n';
             for (let camera of data.cameraPresets) {
                 html += `<hr><div><h2>${camera.presentationName}</h2>` + '\n';
                 html += `<div><img src="${camera.imageUrl}" alt="${camera.presentationName}"></div>` + '\n';
