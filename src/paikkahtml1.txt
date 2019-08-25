@@ -5,6 +5,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<link rel="stylesheet" type="text/css" href="tyylit2.css"/>
 	<style>
+        * {
+            box-sizing: border-box;
+        }
 		body {
 			font-family: Verdana, Geneva, sans-serif;
 		}
@@ -12,6 +15,37 @@
 			height: auto; 
 			width: auto; 
 			max-width: 100%; 
+		}
+        #ekarivi {
+            display: inline-block;
+            width: 100%;
+			align: center;
+        }
+
+		button {
+            width: 20%;
+            background-color: green;
+            border: none;
+            color: white;
+            padding: 3vw;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 4vw;
+            float: right;
+		}
+		h1 {
+            width: 80%;
+            background-color: white;
+            border: none;
+            color: black;
+            padding-top: 0vh;
+            text-align: left;
+			text-decoration: none;
+            display: inline-block;
+            font-size: 5vw;
+            float: left;
+            margin-right: 0px;
 		}
 	</style>
 	<title>
