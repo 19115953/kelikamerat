@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const haetiedot = require('./haetiedot');
 
-const tiedosto = './src/camera-stations.json';
+const tiedosto = './camera-data/camera-stations.json';
 
 const json = fs.readFileSync(tiedosto);
 const arr = JSON.parse(json.toString());
