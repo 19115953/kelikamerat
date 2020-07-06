@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const haetiedot = require('./haetiedot');
 
-const tiedosto = './camera-data/camera-stations.json';
+const tiedosto = './src/camera-stations-reduced.json';
 
 const json = fs.readFileSync(tiedosto);
 const arr = JSON.parse(json.toString());
@@ -69,17 +69,37 @@ app.get('/paikka', function (req, res) {
             html = fs.readFileSync('./src/paikkahtml1.txt').toString();
             html += idPaikka[req.query.id];
             html += fs.readFileSync('./src/paikkahtml2.txt').toString();
+            html += `<input type="hidden" id="place" value="${req.query.id}" />\n`
             html += `<h1>${idPaikka[req.query.id]}</h1>` + '\n';
             for (let camera of data.cameraPresets) {
-                if (camera.presentationName) {
-                    html += `<hr><div><h2>${camera.presentationName}</h2>` + '\n';
-                } else {
-                    html += `<hr>` + '\n';
-                }
-                    html += `<div><img src="${camera.imageUrl}" alt="${camera.id}"></div>` + '\n';
+                let boxClass="boxed";
                 let aikaStr = suomiAika(new Date(camera.measuredTime));
-                html += `<div>${aikaStr}</div>` + '\n';
-                html += `</div>` + '\n';
+                let timeDiff = (Date.now()-Date.parse(camera.measuredTime))/1000/60;
+                if (timeDiff > 60) boxClass="boxed-yellow";
+                if (timeDiff > 24*60) boxClass="boxed-red";
+                if (timeDiff > 259200) continue;
+                if (camera.presentationName) {
+                    html += `<div class="${boxClass}"><hr><h2>${camera.presentationName}</h2>` + '\n';
+                } else {
+                    html += `<div class="${boxClass}"><hr>` + '\n';
+                }
+                html += `\t<img src="${camera.imageUrl}" alt="${camera.id}" id="${camera.id}">\n`;
+                html += `\t<div id="menu">\n`;
+                html += `\t\t<div id="dropdown">\n`;
+                html += `\t\t\t<form>\n`;
+                html += `\t\t\t\t<select class="box ${camera.id}" onchange="updateSlider(this)">\n`;
+                html += `\t\t\t\t\t<option value="0">${aikaStr}</option>\n`;
+                html += `\t\t\t\t</select>\n`;
+                html += `\t\t\t</form>\n`;
+                html += `\t\t</div>\n`;
+                html += `\t\t<div id="slider">\n`;
+                html += `\t\t\t<input class="slider ${camera.id}" type="range" min="0" max="0" oninput="updateDropDown(this)">\n`
+                html += `\t\t</div>\n`;
+                html += `\t</div>\n`;
+                html += `</div>\n`;
+
+//                html += `<div>${aikaStr}</div>` + '\n';
+//                html += `</div>` + '\n';
             }
             html += fs.readFileSync('./src/paikkahtml3.txt').toString();
             res.send(html);

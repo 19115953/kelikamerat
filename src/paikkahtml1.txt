@@ -3,15 +3,9 @@
 	<head>
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<link rel="stylesheet" type="text/css" href="tyylit2.css"/>
-	<style>
-		body {
-			font-family: Verdana, Geneva, sans-serif;
-		}
-		img {
-			height: auto; 
-			width: auto; 
-			max-width: 100%; 
-		}
-	</style>
+	<script src="swiped-events.js"></script>
+	<script src="suomiaika.js"></script>
+	<script src="fetch-camera-history.js"></script>
+	<link rel="stylesheet" type="text/css" href="styles.css"/>
+	<script src="scripts.js"></script>
 	<title>
