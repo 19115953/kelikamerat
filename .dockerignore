@@ -1,0 +1,4 @@
+node_modules/
+camera-data/
+src/camera-stations.json
+src/reduce-camera-stations-data.js
