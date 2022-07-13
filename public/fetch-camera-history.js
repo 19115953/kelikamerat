@@ -24,8 +24,6 @@ async function fetchCameraHistory(id, history) {
             elements[1].style.visibility="visible";
         }
     } catch (error) {
-        console.log("Virhe");
-
         console.log(error);
     }
 }

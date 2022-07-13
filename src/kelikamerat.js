@@ -19,7 +19,7 @@ for (let feature of arr.features) {
     let fiName = feature.properties.names.fi;
 
     function onClick(e) {
-        console.log(e.sourceTarget._popup._content);
+        // console.log(e.sourceTarget._popup._content);
         const id = e.sourceTarget.options.alt;
         const w = window.open("/paikka?id=" + id);
     }
