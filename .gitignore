@@ -1,2 +1,11 @@
 node_modules/
 camera-data/
+src/camera-stations.json
+src/reduce-camera-stations-data.js
+stations-detailed-data/
+stations-data.json
+stations.json
+Dockerfile_old
+fingrid.js
+package-lock.json
+power-system-state.json

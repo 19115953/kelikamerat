@@ -1,12 +1,12 @@
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 
 const haetiedot = (id, callback) => {
-    const url = 'https://tie.digitraffic.fi/api/v1/data/camera-data/' + id;
+    const url = 'https://tie.digitraffic.fi/api/weathercam/v1/stations/' + id;
     fetch(url)
         .then(res => res.json())
         .then(body => {
             callback(undefined, {
-                cameraPresets: body.cameraStations[0].cameraPresets
+                cameraPresets: body.properties.presets
             });
         })
         .catch(err => {

@@ -1,7 +1,7 @@
 const fs = require('fs');
 
-const inFile = 'camera-stations.json';
-const outFile = 'camera-stations-reduced.json';
+const inFile = '../camera-data/stations.json';
+const outFile = './camera-stations-reduced.json';
 
 const json = fs.readFileSync(inFile);
 const arr = JSON.parse(json.toString());

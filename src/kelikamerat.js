@@ -9,37 +9,86 @@ const tiedosto = './src/camera-stations-reduced.json';
 const json = fs.readFileSync(tiedosto);
 const arr = JSON.parse(json.toString());
 
+let roadNumbers = new Set();
+let provinces = new Set();
+let municipalities = new Set();
+
+arr.features.forEach(feature => {
+  roadNumbers.add(feature.properties.roadNumber);
+});
+arr.features.forEach(feature => {
+  provinces.add(feature.properties.province);
+});
+arr.features.forEach(feature => {
+  municipalities.add(feature.properties.municipality);
+});
+
+roadNumbers = Array.from(roadNumbers);
+provinces = Array.from(provinces);
+municipalities = Array.from(municipalities);
+
 let htmlVali = "";
 let idPaikka = {};
+let markerBounds = {};
+let mapCenter = {};
 
-for (let feature of arr.features) {
+const initMap = (arr, lang) => {
+  markerBounds = { minLat: 90, maxLat: -90, minLong: 180, maxLong: -180 };
+  mapCenter = { lat: 0, long: 0, count: 0 };
+  htmlVali = "";
+  for (let feature of arr.features) {
     let long = feature.geometry.coordinates[0];
     let lat = feature.geometry.coordinates[1];
     let id = feature.properties.id;
-    let fiName = feature.properties.names.fi;
+    let name = feature.properties.names[lang];
 
-    function onClick(e) {
-        // console.log(e.sourceTarget._popup._content);
-        const id = e.sourceTarget.options.alt;
-        const w = window.open("/paikka?id=" + id);
-    }
-    function mouseOver(e) {
-        this.openPopup();
-    }
+    if (long < markerBounds.minLong) markerBounds.minLong = long;
+    if (long > markerBounds.maxLong) markerBounds.maxLong = long;
+    if (lat < markerBounds.minLat) markerBounds.minLat = lat;
+    if (lat > markerBounds.maxLat) markerBounds.maxLat = lat;
 
-    htmlVali += `L.marker([${lat}, ${long}], { alt: "${id}"}).on('click', ${onClick}).on('mouseover', ${mouseOver}).addTo(map).bindPopup('${fiName}')`+"\n";
-    idPaikka[id] = fiName;
+    mapCenter.lat = (markerBounds.minLat + markerBounds.maxLat) / 2;
+    mapCenter.long = (markerBounds.minLong + markerBounds.maxLong) / 2;
+    mapCenter.count++;
+    const onClick = (e) => {
+      // console.log(e.sourceTarget._popup._content);
+      const id = e.sourceTarget.options.alt;
+      const w = window.open("/paikka?id=" + id);
+    }
+    const mouseOver = (e) => {
+      e.target.openPopup();
+    }
+    const mouseOut = (e) => {
+      e.target.closePopup();
+    }
+    htmlVali += `L.marker([${lat}, ${long}], { alt: "${id}"}).on('click', ${onClick}).on('mouseover', ${mouseOver}).addTo(map).bindPopup('${name}').on('mouseout', ${mouseOut})`+"\n";
+    idPaikka[id] = name;
+  }
 }
 
 app.use(express.static(path.join(__dirname, '../public')));
 
+const createHtml = (margins = 0.0) => {
+  const bounds = [
+    [markerBounds.minLat * (1 - margins), markerBounds.minLong * (1 - margins)],
+    [markerBounds.maxLat * (1 + margins), markerBounds.maxLong * (1 + margins)]
+  ];
+  let html = "";
+  html = fs.readFileSync('./src/indexhtml_alku.txt').toString();
+  if (mapCenter.count === 1) {
+    html += `\nmap.setView([${mapCenter.lat}, ${mapCenter.long}], 11);\n`
+  } else {
+    html += `\nmap.fitBounds([[${bounds[0]}],[${bounds[1]}]]);\n`
+    html += `\nmap.setView([${mapCenter.lat}, ${mapCenter.long}]);\n`
+  }
+  html += htmlVali;
+  html += fs.readFileSync('./src/indexhtml_loppu.txt').toString();
+  return html;
+}
+
 app.get('/', function (req, res) {
-    let html = "";
-    html = fs.readFileSync('./src/indexhtml_alku.txt').toString();
-    html += htmlVali;
-    html += fs.readFileSync('./src/indexhtml_loppu.txt').toString();
-    
-    res.send(html);
+    initMap(arr, "fi"); 
+    res.send(createHtml());
 });
 
 function suomiAika(aika) {
@@ -59,9 +108,10 @@ function suomiAika(aika) {
     return aikaStr;
 }
 
-
 app.get('/paikka', function (req, res) {
-    haetiedot(req.query.id, (error, data) =>  {
+  console.log(req.query.id + " : " + new Date().toLocaleString('fi-FI', {timeZone: 'Europe/Helsinki'}));
+    if (arr.features.some(feature => feature.properties.id === req.query.id)) {    
+      haetiedot(req.query.id, (error, data) =>  {
         if(error) {
             return res.send({error});
         } else {
@@ -97,14 +147,58 @@ app.get('/paikka', function (req, res) {
                 html += `\t\t</div>\n`;
                 html += `\t</div>\n`;
                 html += `</div>\n`;
-
-//                html += `<div>${aikaStr}</div>` + '\n';
-//                html += `</div>` + '\n';
             }
             html += fs.readFileSync('./src/paikkahtml3.txt').toString();
             res.send(html);
         }
     });
+  } else {
+    res.redirect('/');
+  }
+});
+
+const isNameInNames = (name, names) => {
+  let namesArray = [];
+  const fillArray = (lang) => {
+    if (names.hasOwnProperty(lang)) {
+      const numberIndex = names[lang].search(/\d(?=[^\d]*$)/);
+      const sliced = names[lang].slice(numberIndex + 1).trim();
+      const splitted = sliced.split(',');
+      namesArray.push(...splitted);
+    }
+  }
+  fillArray("fi");
+  fillArray("sv");
+  namesArray = namesArray.map(place => place.trim().toLowerCase());
+  return namesArray.includes(name.toLowerCase());
+}
+
+app.get('/:first', function (req, res) {
+  const params = req.params.first.split(',');
+  let resultArr = [];
+  for (param of params) {
+    if (!isNaN(param)) {
+      const roadNumber = parseInt(param);
+      const filteredArr = arr.features.filter(feature =>
+        (feature.properties.roadNumber === roadNumber
+      ));
+      resultArr.push(...filteredArr);
+    } else {
+      const filteredArr = arr.features.filter(feature => (
+        feature.properties.province.toLowerCase() === param.toLowerCase() ||
+        feature.properties.municipality.toLowerCase() === param.toLowerCase() ||
+        isNameInNames(param, feature.properties.names)
+      ));
+      resultArr.push(...filteredArr);
+    }
+  }
+  if (resultArr.length > 0) {
+    resultArr = Array.from(new Set(resultArr.map(JSON.stringify))).map(JSON.parse);
+    initMap({ features: resultArr }, "fi");
+  } else {
+    initMap(arr, "fi");
+  }
+  res.send(createHtml());
 });
 
 app.get('*', function (req, res) {

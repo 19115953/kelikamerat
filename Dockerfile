@@ -1,24 +1,27 @@
-FROM alpine:3.14
+FROM node:22-alpine
 ENV TZ="Europe/Helsinki"
 ENV PORT=3000
 
 RUN apk update && apk upgrade && \
-    apk add tzdata && \ 
+    apk add --no-cache tzdata && \ 
     cp /usr/share/zoneinfo/$TZ /etc/localtime && \ 
     echo $TZ > /etc/timezone && \
-    apk add curl nodejs npm && \
     rm -rf /var/cache/apk/*
 
 WORKDIR /app
 
 COPY ./ ./
 
-RUN npm update && \
-    npm install
+RUN yarn install && \
+    yarn cache clean
 
 EXPOSE 3000
 
-CMD ["npm", "start", "--", "--p", "3000"]
+# CMD ["yarn", "start", "--", "--p", "3000"]
+
+CMD ["yarn", "start", "--p", "3000"]
+
+
 
 #RUN rm -rf /var/cache/apk/* && apk del tzdata
 
